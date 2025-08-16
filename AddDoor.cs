@@ -12,8 +12,7 @@ namespace PantheonOfRegions
 			BossSequenceDoor sequencedoor = newdoor.GetComponent<BossSequenceDoor>();
 			newdoor.transform.position = new Vector3(132f, 20f, 1.4f);
 			BossSequence sequence = new BossSequence();
-			List<BossScene> bossScenes = new List<BossScene>();
-
+            List<BossScene> bossScenes = new List<BossScene>();
 			foreach (string name in gs.PantheonRooms)
 			{
 				BossScene bossScene = ScriptableObject.CreateInstance<BossScene>();

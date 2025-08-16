@@ -160,7 +160,7 @@ namespace PantheonOfRegions.Behaviours
     {
         private void Start()
         {
-            
+            gameObject.GetComponent<DamageHero>().damageDealt = 2;
             PlayMakerFSM nailCtrl = gameObject.LocateMyFSM("Control");
 
             nailCtrl.ChangeTransition("Init","FINISHED","Check Distance");
@@ -170,8 +170,7 @@ namespace PantheonOfRegions.Behaviours
                 nailCtrl.Fsm.GetFsmVector3("Tele Pos").Value
                 = new Vector3(Random.Range(50f, 72f), Random.Range(heroy+3f, heroy + 8f), 0f);
             }, 0);
-
-            //checkDistance.GetAction<FloatCompare>(2).float2 = 6f;
+            checkDistance.GetAction<FloatCompare>(2).float2 = 4f;
             checkDistance.RemoveAction(3);
             
             nailCtrl.GetState("Recycle").InsertMethod(0, () => Destroy(gameObject));
@@ -181,11 +180,9 @@ namespace PantheonOfRegions.Behaviours
     }
     internal class NoAimMarkothNail : MonoBehaviour
     {
-
         private void Start()
         {
             PlayMakerFSM nailCtrl = gameObject.LocateMyFSM("Control");
-
             nailCtrl.ChangeTransition("Init","FINISHED","Antic");
             nailCtrl.GetState("Antic").GetAction<Wait>(1).time = 1.5f;
             nailCtrl.GetState("Recycle").InsertMethod(0, () => Destroy(gameObject));
@@ -199,7 +196,6 @@ namespace PantheonOfRegions.Behaviours
         private void Start()
         {
             PlayMakerFSM nailCtrl = gameObject.LocateMyFSM("Control");
-
             nailCtrl.ChangeTransition("Init", "FINISHED", "Antic");
             nailCtrl.GetState("Antic").GetAction<Wait>(1).time = 0.5f;
             nailCtrl.GetState("Fire").GetAction<SetVelocityAsAngle>().speed = 20f;

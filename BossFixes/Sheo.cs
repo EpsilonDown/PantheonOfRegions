@@ -17,11 +17,9 @@ namespace PantheonOfRegions.Behaviours
 
         private void Start()
         {
-            GameObject Oro = GameObject.Find("Brothers/Oro");
-            GameObject Mato = GameObject.Find("Brothers/Oro");
+
             _sheoControl.RemoveTransition("Painting", "FINISHED");
             _sheoControl.GetAction<Wait>("Look").time.Value = 1.25f;
-            //Destroy(_stunControl);
             _sheoControl.RemoveAction("Roar", 8);
             _sheoControl.RemoveAction("Roar", 7);
             _sheoControl.RemoveAction("Roar", 6);
@@ -29,11 +27,12 @@ namespace PantheonOfRegions.Behaviours
             _sheoControl.RemoveAction("Roar", 4);
             Modding.Logger.Log("sheo Edited 3/3");
 
+            /*
             _sheoControl.GetState("GSlash Charge").AddCustomAction(() =>
             {
                 Oro.LocateMyFSM("Nailmaster").SetState("D Slash Bro");
                 Mato.LocateMyFSM("Nailmaster").SetState("Cyclone Bro");
-            });
+            }); */
 
 
         }

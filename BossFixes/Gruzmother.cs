@@ -19,7 +19,7 @@ namespace PantheonOfRegions.Behaviours
 
         private void Start()
         {
-            healthsharer = PantheonOfRegions.InstaBoss["flylords"];
+            healthsharer = PantheonOfRegions.SharedBoss;
 
             _control.GetAction<Wait>("GG Extra Pause", 0).time = 5f;
             _control.AddState("Pause");
@@ -30,17 +30,16 @@ namespace PantheonOfRegions.Behaviours
                 time = new(4f),
                 finishEvent = FsmEvent.GetFsmEvent("FINISHED")
             });
-            _control.AddState("Dead");
+            _control.AddState("Stun");
 
         }
         private void Update()
         {
             if (healthsharer.GetComponent<SharedHealthManager>().HP < 400 && end == false)
             {
-                _control.SetState("Dead");
+                _control.SetState("Stun");
                 PantheonOfRegions.InstaBoss["sly"].LocateMyFSM("Control").SendEvent("ZERO HP");
-                gameObject.GetComponent<HealthManager>().IsInvincible = true;
-                end = true;
+                Destroy(gameObject);
             }
 
         }

@@ -10,7 +10,6 @@ namespace PantheonOfRegions.Behaviours
         private PlayMakerFSM _control;
         private PlayMakerFSM zote_control;
         private GameObject _Zote;
-        private int sharedhp;
         private int ragecount = 0;
         
         private void Awake()
@@ -18,12 +17,12 @@ namespace PantheonOfRegions.Behaviours
             _control = gameObject.LocateMyFSM("Control");
         }
 
-        private IEnumerator Start()
+        private void Start()
         {
-            yield return null;
 
             _Zote = PantheonOfRegions.InstaBoss["greyprincezote"];
             zote_control = _Zote.LocateMyFSM("Control");
+
 
             _control.InsertCustomAction("Tele Out",() => {
                 _Zote.GetComponent<GreyPrinceZote>().LeapEnabler();
@@ -31,46 +30,39 @@ namespace PantheonOfRegions.Behaviours
             _control.InsertCustomAction("Spike Return", () => {
                 _Zote.GetComponent<GreyPrinceZote>().LeapBlocker();
             }, 0);
-            _control.InsertCustomAction("Slash Pos", () => {
-                _Zote.GetComponent<GreyPrinceZote>().LeapBlocker();
-            }, 0);
 
-            _control.GetState("Explode").AddMethod(() => _Zote.LocateMyFSM("Control").SendEvent("STUN"));
+            _control.GetState("Explode").AddMethod(() => zote_control.SendEvent("STUN"));
             _control.GetState("Set Balloon HP").RemoveAction(0);
             _control.GetState("Balloon?").RemoveAction(0);
             _control.GetState("Adjust HP").RemoveAction(4);
 
+            FsmState wait = _control.AddState("Move Wait");
+            _control.ChangeTransition("Balloon?","FINISHED","Move Wait");
+            wait.AddTransition("MOVE", "Move Choice");
+
+            #region balloon
+            _control.InsertCustomAction("Set Balloon HP", () => {
+                _control.Fsm.GetFsmInt("HP").Value = PantheonOfRegions.SharedBoss.GetComponent<SharedHealthManager>().HP;
+            }, 0);
             _control.InsertCustomAction("Balloon?", () => {
-                sharedhp = PantheonOfRegions.InstaBoss["reapers"].GetComponent<SharedHealthManager>().HP;
-                if (sharedhp < 1600 && ragecount == 0)
-                {
-                    zote_control.SetState("Longfall");
-                    _control.SendEvent("BALLOON 1");
-                }
-                else if (sharedhp < 1000 && ragecount == 1)
-                {
-                    zote_control.SetState("Longfall");
-                    _control.SendEvent("BALLOON 1");
-                }
-                else if (sharedhp < 500 && ragecount == 2)
-                {
-                    zote_control.SetState("Longfall");
-                    _control.SendEvent("BALLOON 1");
-                }
-                else
-                {
-                    _control.SetState("Move Choice");
-                }
+                _control.Fsm.GetFsmInt("HP").Value = PantheonOfRegions.SharedBoss.GetComponent<SharedHealthManager>().HP;
+            }, 0);
+
+            _control.InsertCustomAction("Balloon Pos", () => {
+                zote_control.SetState("Longfall");
             }, 0);
 
             _control.InsertCustomAction("Deflate", () => {
                 zote_control.SetState("FT Fall");
-                ragecount++;
             }, 0);
-            /* 
-            _control.InsertCustomAction("Adjust HP", () => {
-                PantheonOfRegions.InstaBoss["reapers"].GetComponent<SharedHealthManager>().HP -= _control.Fsm.GetFsmInt("Bat Damage").Value;
-            }, 0); */
+            #endregion
+
+            
+            _control.AddCustomAction("Adjust HP", () => {
+                PantheonOfRegions.SharedBoss.GetComponent<SharedHealthManager>().HP -= _control.Fsm.GetFsmInt("Bat Damage").Value;
+            });
+
+            _control.SetState("Init");
         }
 
         

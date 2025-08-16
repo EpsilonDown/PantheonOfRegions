@@ -6,9 +6,8 @@ namespace PantheonOfRegions.Behaviours
     internal class TheCollector : MonoBehaviour
     {
         private PlayMakerFSM _control;
-        private static List<GameObject> summoned = new List<GameObject>();
-
         private int knightcount = 0;
+        private int actknightcount = 0;
         private void Awake()
         {
             _control = gameObject.LocateMyFSM("Control");
@@ -21,53 +20,49 @@ namespace PantheonOfRegions.Behaviours
             _control.GetState("Init").RemoveAction(13);
             _control.GetState("Init").RemoveAction(12);
             _control.GetState("Init").RemoveAction(11);
-            _control.GetState("Buzzer").RemoveAction(0);
-            _control.GetState("Roller").RemoveAction(0);
-            _control.GetState("Spitter").RemoveAction(0);
-
             foreach (string s in new[] { "Roller", "Spitter", "Buzzer" })
             {
+                _control.GetState(s).RemoveAction(0);
                 _control.AddCustomAction(s, () =>
                 {
-                    if (knightcount < 6)
-                    {
-                        GameObject storedObject = _control.Fsm.GetFsmGameObject("Spawn Jar").Value;
-                        storedObject.AddComponent<SpawnJar>();
-                        knightcount++;
-                    }
+                    KnightSpawner();
                 });
             }
-
-
-
-            //On.HealthManager.Die += CollectorDeath;
 
         }
-        /*
-        private void CollectorDeath(On.HealthManager.orig_Die orig, HealthManager self, float? attackDirection, AttackTypes attackType, bool ignoreEvasion)
+        private void KnightSpawner()
         {
-            foreach (GameObject boss in summoned)
+            if (knightcount < 6 && actknightcount < 2)
             {
-                GameObject.Destroy(boss);
+                GameObject storedObject = _control.Fsm.GetFsmGameObject("Spawn Jar").Value;
+                storedObject.AddComponent<SpawnJar>();
+                knightcount++;
+                actknightcount++;
             }
-        } */
-        internal class SpawnJar : MonoBehaviour
+        }
+        
+        internal void KnightRemover()
         {
-            private IEnumerator Start()
+            actknightcount--;
+        } 
+
+    }
+    internal class SpawnJar : MonoBehaviour
+    {
+        private IEnumerator Start()
+        {
+            yield return new WaitUntil(() =>
             {
-                yield return new WaitUntil(() =>
-                {
-                    return gameObject.transform.GetPositionY() < 98;
-                });
-                GameObject jarspawn = Instantiate(PantheonOfRegions.GameObjects["watcherknight"], new Vector3(50f, 98f, 0f), Quaternion.identity);
-                //jarspawn.tag = "Boss";
-                jarspawn.transform.position = transform.position;
-                jarspawn.AddComponent<EnemyTracker>();
-                jarspawn.GetComponent<HealthManager>().hp = 200;
-                jarspawn.AddToShared(PantheonOfRegions.InstaBoss["collector"].GetComponent<SharedHealthManager>());
-                jarspawn.GetComponent<HealthManager>().hp = 200;
-                jarspawn.SetActive(true);
-            }
+                return gameObject.transform.GetPositionY() < 97;
+            });
+            GameObject jarspawn = Instantiate(PantheonOfRegions.GameObjects["watcherknight"], new Vector3(50f, 98f, 0f), Quaternion.identity);
+            jarspawn.transform.position = transform.position;
+            jarspawn.SetActive(true);
+            jarspawn.AddComponent<EnemyTracker>();
+            jarspawn.GetComponent<HealthManager>().hp = 200;
+            jarspawn.AddToShared(PantheonOfRegions.SharedBoss.GetComponent<SharedHealthManager>());
+            jarspawn.GetComponent<HealthManager>().hp = 200;
+            
         }
     }
 

@@ -20,7 +20,7 @@ namespace PantheonOfRegions.Behaviours
             var corpse = ReflectionHelper.GetField<EnemyDeathEffects, GameObject>(GetComponent<EnemyDeathEffectsNoEffect>(), "corpse");
             corpse.LocateMyFSM("Control").GetState("End").RemoveAction<CreateObject>();
 
-            GetComponent<HealthManager>().OnDeath += OnDeath;
+            //GetComponent<HealthManager>().OnDeath += OnDeath;
         }
 
         private void Start()
@@ -43,8 +43,8 @@ namespace PantheonOfRegions.Behaviours
         private Vector3 RandomVector3()
         {
             float x = Random.Range(90f, 120f);
-            float y = Random.Range(10f, 15f);
-            float z = 0.006f;
+            float y = Random.Range(8f, 10f);
+            float z = 0f;
 
             return new Vector3(x, y, z);
         }
@@ -71,9 +71,10 @@ namespace PantheonOfRegions.Behaviours
             _attack.Fsm.GetFsmFloat("Slam Y").Value = 5.4f;
             _attack.Fsm.GetFsmFloat("Wall L X").Value = 71f;
             _attack.Fsm.GetFsmFloat("Wall R X").Value = 117f;
-
+            _attack.GetAction<FloatTestToBool>("Chase", 8).float2 = 5f;
+            _attack.GetAction<FloatTestToBool>("Chase", 9).float2 = 10f;
             _control.GetAction<SetVector3XYZ>("Init").x = transform.position.x;
-            _attack.GetAction<ChaseObjectV2>("Chase").accelerationForce = 10f;
+            _attack.GetAction<ChaseObjectV2>("Chase").accelerationForce = 0.5f;
 
             _attack.SetState(_attack.Fsm.StartState);
             _control.SetState(_control.Fsm.StartState);

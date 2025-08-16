@@ -8,7 +8,6 @@ namespace PantheonOfRegions.Behaviours
     {
         private PlayMakerFSM _control;
         private PlayMakerFSM _hpcheck;
-        private SharedHealthManager hpsharer;
         private GameObject Mawlek;
         private BossSpawner Spawner = new BossSpawner();
         private bool end = false;
@@ -37,8 +36,7 @@ namespace PantheonOfRegions.Behaviours
         }
         private void Update()
         {
-            int sharedhp = PantheonOfRegions.InstaBoss["crossroads"].GetComponent<SharedHealthManager>().HP;
-
+            int sharedhp = PantheonOfRegions.SharedBoss.GetComponent<SharedHealthManager>().HP;
             if (sharedhp < 1110 && _hpcheck.Fsm.GetFsmBool("Stun 1").Value == false)
             {
                 _hpcheck.Fsm.GetFsmBool("Stun 1").Value = true;

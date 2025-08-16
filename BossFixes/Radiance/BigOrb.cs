@@ -6,7 +6,7 @@ namespace PantheonOfRegions.Actions
 {
     internal class BigOrb : MonoBehaviour
     {
-        private float _growRate = 0.6f;
+        private float _growRate = 1f;
         private float _killScale = 10f;
         private GameObject killer;
 
@@ -17,13 +17,12 @@ namespace PantheonOfRegions.Actions
             PantheonOfRegions.RadianceObjects["Shot Charge"].transform.position = transform.position;
             PantheonOfRegions.RadianceObjects["Shot Charge"].GetComponent<ParticleSystem>().Play();
             PantheonOfRegions.InstaBoss["seer"].LocateMyFSM("Movement").SetState("Wait");
+
             Destroy(gameObject.transform.Find("Hero Hurter").gameObject);
-
-            //PantheonOfRegions.AudioClips["Ghost"].PlayOneShot(transform.position);
-
             Destroy(gameObject.GetComponentInChildren<CircleCollider2D>());
 
-            
+            PantheonOfRegions.AudioClips["Scream"].PlayOneShot(transform.position);
+
 
             yield return new WaitUntil(() =>
             {
@@ -42,7 +41,6 @@ namespace PantheonOfRegions.Actions
             collider.isTrigger = true;
             collider.radius = 100;
             killer.transform.SetPosition2D(HeroController.instance.transform.position);
-            Modding.Logger.Log("Orb Exploded!");
 
             yield return new WaitForSeconds(0.1f);
 
@@ -52,13 +50,29 @@ namespace PantheonOfRegions.Actions
         {
             gameObject.LocateMyFSM("Orb Control").SetState("Dissipate");
             PantheonOfRegions.InstaBoss["seer"].LocateMyFSM("Movement").SetState("Choose Target");
+            PantheonOfRegions.AudioClips["Explode"].PlayOneShot(transform.position);
             Destroy(gameObject);
             if (killer != null)
             {
                 Destroy(killer);
             }
         }
-        
-        
+
+    }
+    internal static class Extensions
+    {
+        public static void PlayOneShot(this AudioClip clip, Vector3 location)
+        {
+            IEnumerator PlayAndRecycle()
+            {
+                GameObject audioPlayer = PantheonOfRegions.RadianceObjects["Audio Player"].Spawn(location);
+                var audioSource = audioPlayer.GetComponent<AudioSource>();
+                audioSource.clip = clip;
+                audioSource.Play();
+                yield return new WaitForSeconds(clip.length);
+                audioSource.clip = null;
+            }
+            GameManager.instance.StartCoroutine(PlayAndRecycle());
+        }
     }
 }

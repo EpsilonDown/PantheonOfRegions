@@ -59,8 +59,11 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\**" />
     <EmbeddedResource Include="Assets\Resources\VoidKin.png" />
-    <EmbeddedResource Include="Assets\Resources\Seer.png" />
     <EmbeddedResource Include="Assets\Resources\void_glob.png" />
+    <EmbeddedResource Include="Assets\Resources\Seer.png" />
+    <EmbeddedResource Include="Assets\Resources\Seersoul.png" />
+    <EmbeddedResource Include="Assets\Resources\Seernail.png" />
+    <EmbeddedResource Include="Assets\Resources\Seermask.png" />
     <None Include=".gitignore" />
     <None Include="ReadMe.md" />
   </ItemGroup>

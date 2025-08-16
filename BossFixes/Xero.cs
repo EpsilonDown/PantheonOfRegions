@@ -24,8 +24,7 @@ namespace PantheonOfRegions.Behaviours
 
         private void Start()
         {
-            SharedHealthManager crystals = new[] { PantheonOfRegions.InstaBoss["guardian"] , gameObject }.ShareHealth(name: "fanatics");
-            crystals.HP = 1000;
+            
             for (int i = 1; i <= 2; i++)
             {
                 GameObject sword = gameObject.Find("Sword " + i );
@@ -72,18 +71,13 @@ namespace PantheonOfRegions.Behaviours
             _summon.RemoveAction("Check", 1);
             _summon.RemoveAction("Check", 0);
             _summon.ChangeTransition("Init", "FINISHED", "Check");
-            _summon.InsertCustomAction("Check", () =>
-            {
-                if (crystals.gameObject.GetComponent<SharedHealthManager>().HP < 600)
-                {
-                    _summon.SendEvent("SUMMON");
-                }    
-            }, 0);
+            _summon.SetState("Init");
+
         }
         private Vector3 RandomVector3()
         {
             float x = Random.Range(20f, 40f);
-            float y = Random.Range(20f, 23f);
+            float y = Random.Range(18f, 22f);
             float z = 0.006f;
 
             return new Vector3(x, y, z);

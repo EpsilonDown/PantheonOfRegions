@@ -3,6 +3,7 @@ using Osmi.Game;
 using Vasi;
 using PantheonOfRegions.Actions;
 using Random = UnityEngine.Random;
+using Satchel;
 
 namespace PantheonOfRegions.Behaviours
 {
@@ -42,9 +43,6 @@ namespace PantheonOfRegions.Behaviours
         {
 
             //for debug
-            //gameObject.LocateMyFSM("Attack Choices")
-            //.GetAction<SendRandomEventV3>("A1 Choice")
-            //.weights = new FsmFloat[] { 0f, 0f, 0f, 1f, 0f, 0f, 0.5f, 0f };
 
             for (int i = 1; i <= 3; i++)
             {
@@ -59,12 +57,12 @@ namespace PantheonOfRegions.Behaviours
 
             #region Phase Controller
 
-            _phase.Fsm.GetFsmInt("HP").Value = 3600;
+            _phase.Fsm.GetFsmInt("HP").Value = healthsharer.GetComponent<SharedHealthManager>().HP;
             _phase.Fsm.GetFsmInt("P2 Spike Waves").Value = 3100;
             _phase.Fsm.GetFsmInt("P3 A1 Rage").Value = 2600;
             _phase.Fsm.GetFsmInt("P4 Stun1").Value = 2200;
             _phase.Fsm.GetFsmInt("P5 Ascend").Value = 1000;
-            _control.Fsm.GetFsmInt("Death HP").Value = 100;
+            _control.Fsm.GetFsmInt("Death HP").Value = 500;
 
             for (int i=1; i<=4; i++)
             {
@@ -213,15 +211,12 @@ namespace PantheonOfRegions.Behaviours
                 mk_shield.SetState("Ready");
                 mk_attack.SetState("Stun");
                 markoth.SetActive(false);
-                seer.SetActive(false);
-                if (PantheonOfRegions.InstaBoss["bigorb"] != null) { Destroy(PantheonOfRegions.InstaBoss["bigorb"]); }
-                StopAllCoroutines();
                 if (uppershields != null) { foreach (GameObject s in uppershields) { Destroy(s); }; }
             },0);
 
             _control.AddCustomAction("Ascend Cast", () =>
             {
-                markoth.transform.position = new Vector3(60f, 105f, 0);
+                markoth.transform.position = new Vector3(60f, 125f, 0);
                 markoth.GetComponent<HealthManager>().IsInvincible = true;
                 markoth.GetComponent<Markoth>().Phase3();
                 markoth.SetActive(true);
@@ -240,20 +235,17 @@ namespace PantheonOfRegions.Behaviours
                 gameObject.transform.Find("Halo").gameObject.GetComponent<SpriteRenderer>().color = invisible;
                 gameObject.transform.Find("Pt Tele Out").gameObject.SetActive(false);
                 gameObject.GetComponent<PolygonCollider2D>().enabled = false;
+                Destroy(seer);
                 StartCoroutine(StartPhase3());
             });
             _commands.GetState("Set Final Orbs").GetAction<Wait>().time = 2f;
-            _control.AddCustomAction("Set Tele Pos", () =>
-            {
-                radsprite.color = Color.white;
-                gameObject.transform.Find("Legs").gameObject.GetComponent<tk2dSprite>().color = Color.white;
-                gameObject.transform.Find("Halo").gameObject.GetComponent<SpriteRenderer>().color = Color.white;
-                gameObject.GetComponent<PolygonCollider2D>().enabled = true;
-            });
-            Modding.Logger.Log("P2 Edit Completed!!");
+
+            
+
         }
         private IEnumerator StartPhase3()
         {
+            PlayerData.instance.equippedCharm_30 = false;
             for (int y = 0; y <= 1; y++)
             {
                 for (int x = 0; x < 5; x++)
@@ -265,14 +257,24 @@ namespace PantheonOfRegions.Behaviours
                     radclones.Add(Radclone);
                 }
             }
+            _control.AddCustomAction("Death Ready", () =>
+            {
+                radsprite.color = Color.white;
+                gameObject.transform.Find("Legs").gameObject.GetComponent<tk2dSprite>().color = Color.white;
+                gameObject.transform.Find("Halo").gameObject.GetComponent<SpriteRenderer>().color = Color.white;
+                gameObject.GetComponent<PolygonCollider2D>().enabled = true;
+                if (radclones != null) { foreach (GameObject s in radclones) { Destroy(s); }; }
+                if (markoth != null) { Destroy(markoth); };
+            });
+            
+            //_control.ChangeTransition("Tendrils 2", "FINISHED", "Statue Death 1");
             yield return new WaitForSeconds(1f);
             Shuffling();
-            Modding.Logger.Log("P3 Edit Completed!!");
         }
 
         private void GetChildren()
         {
-            healthsharer = PantheonOfRegions.InstaBoss["moths"];
+            healthsharer = PantheonOfRegions.SharedBoss;
             markoth = PantheonOfRegions.InstaBoss["markoth"];
             seer = PantheonOfRegions.InstaBoss["seer"];
             mk_control = PantheonOfRegions.InstaBoss["markoth"].GetComponent<Markoth>();
@@ -282,8 +284,6 @@ namespace PantheonOfRegions.Behaviours
             shield = GameObject.Find("Markoth Shield(Clone)");
             Destroy(shield.LocateMyFSM("Control"));
             shield!.SetActive(false);
-
-            
             GameObject _bossCtrl = transform.parent.gameObject;
             PantheonOfRegions.RadianceObjects["Abyss Pit"] = _bossCtrl.transform.Find("Abyss Pit").gameObject;
             PantheonOfRegions.RadianceObjects["Radiance"] = gameObject;
@@ -297,19 +297,20 @@ namespace PantheonOfRegions.Behaviours
             PantheonOfRegions.RadianceObjects["Sweep Beam"] = _bossCtrl.gameObject.transform.Find("Beam Sweeper").gameObject;
             PantheonOfRegions.RadianceObjects["Sweep Beam 2"] = Instantiate(PantheonOfRegions.RadianceObjects["Sweep Beam"]);
             PantheonOfRegions.RadianceObjects["Audio Player"] = gameObject.LocateMyFSM("Teleport").GetAction<AudioPlayerOneShotSingle>("Antic").audioPlayer.Value;
-            PantheonOfRegions.AudioClips["Ghost"] = (AudioClip)_control.GetAction<AudioPlayerOneShotSingle>("Orb Summon").audioClip.Value;
+            PantheonOfRegions.AudioClips["Ghost"] = (AudioClip)_commands.GetAction<AudioPlayerOneShotSingle>("Orb Summon").audioClip.Value;
             PantheonOfRegions.AudioClips["Explode"] = (AudioClip)_control.GetAction<AudioPlayerOneShotSingle>("Knight Break").audioClip.Value;
             PantheonOfRegions.AudioClips["Final Hit 2"] = (AudioClip)_control.GetAction<AudioPlayerOneShotSingle>("Statue Death 1").audioClip.Value;
-
+            PantheonOfRegions.AudioClips["Scream"] = (AudioClip)_control.GetAction<AudioPlayerOneShotSingle>("Scream").audioClip.Value;
         }
         private void reflectorshield()
         {
             if (phase == 1)
             {
+                int randomangle = Random.Range(0, 1);
                 for (int x = -15; x <= 15; x += 3)
                 {
                     Vector3 shieldpos = new Vector3(gameObject.transform.GetPositionX() + x, 38f - 0.02f * x * x, 0);
-                    GameObject mshield = Instantiate(shield, shieldpos, Quaternion.Euler(0, 0, 90 - 3 * x));
+                    GameObject mshield = Instantiate(shield, shieldpos, Quaternion.Euler(0, 0, 90 - 3 * x -2f * randomangle));
                     mshield.SetActive(true);
                     shields.Add(mshield);
 
@@ -346,17 +347,27 @@ namespace PantheonOfRegions.Behaviours
         }
         private IEnumerator OrbCooldown(bool initial)
         {
-            yield return new WaitForSeconds(initial ? 5f : Random.Range(23f, 25f));
+            yield return new WaitForSeconds(initial ? 2f : Random.Range(18f, 20f));
             if (phase == 2)
             {
-                GameObject MegaOrb = Instantiate(PantheonOfRegions.RadianceObjects["Orb"], new Vector3(60f, 40f, 0f), Quaternion.identity);
+                GameObject MegaOrb = Instantiate(PantheonOfRegions.RadianceObjects["Orb"], new Vector3(60f, 45f, 0f), Quaternion.identity);
                 MegaOrb.AddComponent<BigOrb>();
                 MegaOrb.SetActive(true);
+            }
+            if (initial == true)
+            {
+                PlayMakerFSM convo = PlayMakerFSM.FindFsmOnGameObject(HutongGames.PlayMaker.FsmVariables.GlobalVariables.GetFsmGameObject("Enemy Dream Msg").Value, "Display");
+                convo.FsmVariables.GetFsmInt("Convo Amount").Value = 1;
+                convo.FsmVariables.GetFsmString("Convo Title").Value = "SEER_BATTLE";
+                convo.SendEvent("DISPLAY ENEMY DREAM");
+                yield return new WaitForSeconds(3f);
+                convo.SendEvent("CANCEL ENEMY DREAM");
             }
         }
         internal void Shuffling()
         {
-             Coroutine coroutine = StartCoroutine(ShuffleRad());
+            StopAllCoroutines();
+            StartCoroutine(ShuffleRad());
         }
         internal IEnumerator ShuffleRad()
         {
@@ -370,7 +381,6 @@ namespace PantheonOfRegions.Behaviours
                 yield return new WaitForSeconds(0.3f);
                 int truerad = Random.Range(0, radclones.Count - 1);
                 radclones[truerad].GetComponent<RadClone>().TrueRad();
-                Modding.Logger.Log("TPed");
                 yield return new WaitForSeconds(0.3f);
             }
 

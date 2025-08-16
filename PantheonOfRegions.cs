@@ -9,7 +9,7 @@ namespace PantheonOfRegions
 		public bool isCustom = false;
         public PantheonOfRegions() =>
 			OsmiHooks.SceneChangeHook += EditScene;
-        public override string GetVersion() => "v0.1";
+        public override string GetVersion() => "v1.1-beta";
 	
         public override void Initialize(Dictionary<string, Dictionary<string, GameObject>> preloadedObjects)
         {
@@ -102,7 +102,9 @@ namespace PantheonOfRegions
             "MIMIC_SPIDER_SUB" => "Stalkers",
             "WHITE_DEFENDER_MAIN" => "Waterways",
             "WHITE_DEFENDER_SUB" => "Guardians",
-            "HORNET_MAIN" => "Stinger Knights",
+            "COLLECTOR_SUPER" => "The City",
+            "HORNET_MAIN" => "Stinger",
+            "HORNET_SUB" => "Knights",
             "LOBSTER_LANCER_C_SUPER" => "Champions of",
             "LOBSTER_LANCER_C_MAIN" => "Colosseum",
 	        "BIGFLY_SUPER" => "Lord of",
@@ -113,7 +115,7 @@ namespace PantheonOfRegions
             "HK_PRIME_MAIN" => "Void Vessels",
             "ABSOLUTE_RADIANCE_MAIN" => "RADIANCE",
             "ABSOLUTE_RADIANCE_SUPER" => "Mother Of Moths",
-
+            "SEER_BATTLE_1" => "Radiance is charging her ultimate attack! Dreamnail me to stop it!",
             _ => orig
 
         };

@@ -22,16 +22,16 @@ namespace PantheonOfRegions.Behaviours
         private void Start()
         {
             _attack.RemoveAction("Init 2", 1);
-            _attack.Fsm.GetFsmInt("HP").Value = 1000;
+            _attack.Fsm.GetFsmInt("HP").Value = 1200;
             _attack.RemoveAction("Double?", 0);
             _attack.InsertCustomAction("Double?", () => { 
-               _attack.Fsm.GetFsmInt("HP").Value = PantheonOfRegions.InstaBoss["cliffs"].GetComponent<SharedHealthManager>().HP;
+               _attack.Fsm.GetFsmInt("HP").Value = PantheonOfRegions.SharedBoss.GetComponent<SharedHealthManager>().HP;
             }, 0);
             _attack.RemoveAction("Triple?", 0);
             _attack.InsertCustomAction("Triple?", () => {
-                _attack.Fsm.GetFsmInt("HP").Value = PantheonOfRegions.InstaBoss["cliffs"].GetComponent<SharedHealthManager>().HP;
+                _attack.Fsm.GetFsmInt("HP").Value = PantheonOfRegions.SharedBoss.GetComponent<SharedHealthManager>().HP;
             }, 0);
-
+            _attack.ChangeTransition("Wait", "FINISHED", "Antic");
             Destroy(gameObject.LocateMyFSM("Broadcast Ghost Death"));
             _movement.SetState(_movement.Fsm.StartState);
 

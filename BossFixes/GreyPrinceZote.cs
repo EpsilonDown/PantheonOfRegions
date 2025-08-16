@@ -40,8 +40,14 @@ namespace PantheonOfRegions.Behaviours
                 zoteling.SetActive(true);
             }, 0);
 
+            _control.InsertCustomAction("Move Choice 3", () => {
+                PantheonOfRegions.InstaBoss["nkg"].LocateMyFSM("Control").SendEvent("MOVE");
+            }, 0);
 
-            
+            _control.InsertCustomAction("Ft Waves", () => {
+                PantheonOfRegions.InstaBoss["nkg"].LocateMyFSM("Control").SendEvent("MOVE");
+            }, 0);
+
             _control.Fsm.GetFsmFloat("Left X").Value = 72f;
             _control.Fsm.GetFsmFloat("Right X").Value = 101f;
             _control.RemoveAction("Enter 2", 0);

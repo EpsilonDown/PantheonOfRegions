@@ -10,9 +10,7 @@ namespace PantheonOfRegions.Actions
 
         // 11, 37 bench cord
         private bool truerad = false;
-        private tk2dSprite? seerSprite = null;
         private PlayMakerFSM damaged;
-        private PlayMakerFSM radattack;
         private tk2dSprite? clonesprite = null;
         private static readonly Lazy<Texture2D> seerTex = new(() => AssemblyUtils.GetTextureFromResources("Seer.png"));
         private Spritebuilder spritebuilder = new Spritebuilder();
@@ -29,14 +27,12 @@ namespace PantheonOfRegions.Actions
         }
         private void Start()
         {
+            spritebuilder.ApplyTextureToTk2dSprite(gameObject, seerTex.Value);
             damaged.GetAction<SendRandomEvent>("Decide").weights = new FsmFloat[] { 0f, 1f };
             damaged.InsertCustomAction("Decide", () =>
             {
                 if (truerad == false)
                 {
-                    //GameObject beam = Instantiate(PantheonOfRegions.RadianceObjects["Beam Burst"], gameObject.transform);
-                    //beam.AddComponent<CloneBeam>();
-                    //beam.SetActive(true);
                     StartCoroutine(NailSpammer());
                 }
             },0);
@@ -45,8 +41,7 @@ namespace PantheonOfRegions.Actions
             {
                 PantheonOfRegions.RadianceObjects["Radiance"].GetComponent<AbsoluteRadiance>().Shuffling();
             });
-            spritebuilder.ApplyTextureToTk2dSprite(gameObject, seerTex.Value);
-
+            
         }
         internal void TrueRad()
         {
@@ -69,8 +64,7 @@ namespace PantheonOfRegions.Actions
 
         private void HealthManagerTakeDamage(On.HealthManager.orig_TakeDamage orig, HealthManager self, HitInstance hit)
         {
-            PantheonOfRegions.InstaBoss["moths"].GetComponent<SharedHealthManager>().HP -= hit.DamageDealt;
-            
+            PantheonOfRegions.SharedBoss.GetComponent<SharedHealthManager>().HP -= hit.DamageDealt;
             orig(self, hit);
         }
         internal IEnumerator NailSpammer()

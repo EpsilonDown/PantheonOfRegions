@@ -1,6 +1,7 @@
 using Vasi;
 using HutongGames.PlayMaker.Actions;
 using Osmi.Game;
+using GlobalEnums;
 
 namespace PantheonOfRegions.Behaviours
 {
@@ -8,18 +9,18 @@ namespace PantheonOfRegions.Behaviours
     {
 
         private GameObject healthsharer;
-        //private int sharedhp;
         private bool end = false;
         
         private void Start()
         {
-            healthsharer = PantheonOfRegions.InstaBoss["colosseum"];
+            healthsharer = PantheonOfRegions.SharedBoss;
         }
         private void Update()
         {
             if (healthsharer.GetComponent<SharedHealthManager>().HP < 600 && end == false)
             {
-                Destroy(PantheonOfRegions.InstaBoss["oblobble"]);
+                PantheonOfRegions.InstaBoss["oblobble"].GetComponent<HealthManager>().StopSharing(10);
+                PantheonOfRegions.InstaBoss["oblobble"].GetComponent<HealthManager>().Die(1f, AttackTypes.Generic, true);
                 PantheonOfRegions.InstaBoss["rageblobble"].SetActive(true);
                 PantheonOfRegions.InstaBoss["rageblobble"].AddComponent<Rageblobble>();
                 end = true;

@@ -5,13 +5,8 @@ public partial class PantheonOfRegions
 	public List<(string, string)> preloads = new();
     public static Dictionary<string, GameObject> GameObjects = new();
     public static Dictionary<string, GameObject> RadianceObjects = new() { };
-    public static Dictionary<string, AudioClip> AudioClips = new() { };
-    public static Dictionary<string, GameObject> InstaBoss = new() 
-    {
-        ["cliffs"] = null,
-        ["flylords"] = null,
-        ["bigorb"] = null,
-    };
+    public static Dictionary<string, AudioClip> AudioClips = new() {};
+    public static Dictionary<string, GameObject> InstaBoss = new() {};
 
     private Dictionary<string, (string, string)> _preloadDictionary = new()
     {

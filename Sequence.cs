@@ -5,7 +5,7 @@ namespace PantheonOfRegions
     {
 		
 		public List<string> PantheonRooms = new List<string> {
-			"GG_Vengefly_V",
+            "GG_Vengefly_V",
 			"GG_Mega_Moss_Charger",
 			"GG_Failed_Champion",
 			"GG_Mantis_Lords_V",

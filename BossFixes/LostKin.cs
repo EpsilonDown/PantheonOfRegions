@@ -1,8 +1,6 @@
 using Vasi;
 using HutongGames.PlayMaker.Actions;
-using System.Reflection;
-using UnityEngine.Tilemaps;
-using Satchel;
+using Random = UnityEngine.Random;
 
 namespace PantheonOfRegions.Behaviours
 {
@@ -10,7 +8,6 @@ namespace PantheonOfRegions.Behaviours
     {
         private PlayMakerFSM _control;
         private PlayMakerFSM _spawn;
-        private tk2dSprite? lostkinSprite = null;
         private static readonly Lazy<Texture2D> lostkinTex = new(() => AssemblyUtils.GetTextureFromResources("VoidKin.png"));
         private BossSpawner Spawner = new BossSpawner();
         private Spritebuilder Spritebuilder = new Spritebuilder();
@@ -25,17 +22,15 @@ namespace PantheonOfRegions.Behaviours
         private void Start()
         {
             Spritebuilder.ApplyTextureToTk2dSprite(gameObject, lostkinTex.Value);
-
             for (int x = 16; x >= 6; x-=2)
             {
                 _control.InsertCustomAction("Dstab Land", () =>
                 { _control.Fsm.GetFsmGameObject("Projectile").Value.AddComponent<Headglob>(); }, x);
             }
-
             _control.AddState("Final Stun");
             _control.GetState("Final Stun").CopyActionData(_control.GetState("Stun Start"));
 
-            _control.GetAction<SendRandomEvent>("Damage Response").weights = new FsmFloat[] { 0.3f, 0f, 0.3f, 1f };
+            _control.GetAction<SendRandomEvent>("Damage Response").weights = new FsmFloat[] { 0.3f, 0f, 0.3f, 0.2f };
 
             _control.GetAction<Tk2dPlayAnimationWithEvents>("Intro Land").animationCompleteEvent = null;
 
@@ -78,16 +73,13 @@ namespace PantheonOfRegions.Behaviours
             _control.GetAction<SetPosition>("Set X", 2).x = transform.position.x;
             _control.GetAction<SetDamageHeroAmount>("Roar End", 3).damageDealt = 2;
 
+            _control.RemoveAction("Dstab Land", 2);
             _control.RemoveAction("Roar", 9);
             _control.RemoveAction("Roar", 8);
             _control.RemoveAction("Roar", 7);
             _control.RemoveAction("Roar", 6);
             _control.RemoveAction("Roar", 1);
 
-            _spawn.Fsm.GetFsmFloat("X Min").Value = 30f;
-            _spawn.Fsm.GetFsmFloat("X Max").Value = 60f;
-            _spawn.Fsm.GetFsmFloat("Y Min").Value = 7f;
-            _spawn.Fsm.GetFsmFloat("Y Max").Value = 12f;
             _spawn.Fsm.GetFsmFloat("Wait Min").Value = 5f;
             _spawn.Fsm.GetFsmFloat("Wait Max").Value = 6f;
             _spawn.RemoveAction("Spawn", 8);
@@ -95,7 +87,13 @@ namespace PantheonOfRegions.Behaviours
 
             _spawn.AddCustomAction("Spawn", () =>
             {
-                GameObject shade = Spawner.SpawnBoss("sibling", _spawn.Fsm.GetFsmVector3("Spawn Vector").Value);
+                Vector3 SpawnPos;
+                while (true)
+                {
+                    SpawnPos = new Vector3(Random.Range(30f, 60f), Random.Range(8f, 14f), 0f);
+                    if (Vector2.Distance(HeroController.instance.transform.position, SpawnPos) > 10f) break;
+                }
+                GameObject shade = Spawner.SpawnBoss("sibling", SpawnPos);
                 shade.SetActive(true);
                 Destroy(shade.transform.GetChild(6).gameObject);
                 _spawn.Fsm.GetFsmGameObject("Spawned Enemy").Value = shade;

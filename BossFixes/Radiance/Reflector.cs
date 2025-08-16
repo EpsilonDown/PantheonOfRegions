@@ -34,7 +34,7 @@ namespace PantheonOfRegions.Actions
                     Reflectangle = new Vector3(0f, 0f, Mathf.Atan2(Reflectdir.x, Reflectdir.y) * Mathf.Rad2Deg + 90f);
                     refbeam = Instantiate(PantheonOfRegions.RadianceObjects["Eye Beam"], Reflectpos, Quaternion.Euler(Reflectangle));
                     refbeam.RemoveComponent<ReflectBeam>();
-                    refbeam.RemoveComponent<ReflectedBeam>();
+                    refbeam.AddComponent<ReflectedBeam>();
                     refbeam.SetActive(true);
                     refbeam.LocateMyFSM("Control").SendEvent("ANTIC");
                 }

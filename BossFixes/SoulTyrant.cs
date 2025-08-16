@@ -15,8 +15,13 @@ namespace PantheonOfRegions.Behaviours
         {
             _mage.AddCustomAction("Quake Antic", () =>
             {
-                GameObject folly = Instantiate(PantheonOfRegions.GameObjects["folly"],
-                    new Vector3(Random.Range(3f, 36f), Random.Range(35f, 40f), 0f), Quaternion.identity);
+                Vector3 SpawnPos;
+                while (true)
+                {
+                    SpawnPos = new Vector3(Random.Range(3f, 36f), Random.Range(35f, 40f), 0f);
+                    if (Vector2.Distance(HeroController.instance.transform.position, SpawnPos) > 8f) break;
+                }
+                GameObject folly = Instantiate(PantheonOfRegions.GameObjects["folly"], SpawnPos, Quaternion.identity);
                 Destroy(folly.transform.GetChild(5).gameObject);
                 Destroy(folly.transform.GetChild(4).gameObject);
                 folly.LocateMyFSM("Control").ChangeTransition("Initiate","FINISHED","Startle");
@@ -24,8 +29,13 @@ namespace PantheonOfRegions.Behaviours
             });
             _mage.AddCustomAction("Orb Summon", () =>
             {
-                GameObject blob = Instantiate(PantheonOfRegions.GameObjects["blob"],
-                    new Vector3(Random.Range(3f, 36f), 29f, 0f), Quaternion.identity);
+                Vector3 SpawnPos;
+                while (true)
+                {
+                    SpawnPos = new Vector3(Random.Range(3f, 36f), 29f, 0f);
+                    if (Vector2.Distance(HeroController.instance.transform.position, SpawnPos) > 6f) break;
+                }
+                GameObject blob = Instantiate(PantheonOfRegions.GameObjects["blob"], SpawnPos, Quaternion.identity);
                 Destroy(blob.transform.GetChild(2).gameObject);
                 blob.LocateMyFSM("Blob").ChangeTransition("Init", "SPAWNS", "Activate");
                 blob.SetActive(true);

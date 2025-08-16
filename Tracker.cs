@@ -4,18 +4,17 @@ namespace PantheonOfRegions
 {
     internal class EnemyTracker : MonoBehaviour
     {
-        private void Awake()
-        {
-        }
-
         private void Start()
         {
             string goName = gameObject.name;
 
-            
             if (goName.Contains("Mawlek Body"))
             {
                 gameObject.AddComponent<BroodingMawlek>();
+            }
+            else if (goName.Contains("Mimic Spider"))
+            {
+                gameObject.AddComponent<Nosk>();
             }
             else if (goName.Contains("False Knight Dream"))
             {
@@ -112,10 +111,6 @@ namespace PantheonOfRegions
             else if (goName.Contains("Nightmare Grimm Boss"))
             {
                 gameObject.AddComponent<NightmareKingGrimm>();
-            }
-            else if (goName.Contains("Blow Fly"))
-            {
-                gameObject.AddComponent<Seer>();
             }
 
         }

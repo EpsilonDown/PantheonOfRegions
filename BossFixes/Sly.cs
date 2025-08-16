@@ -1,5 +1,6 @@
 using HutongGames.PlayMaker.Actions;
 using Osmi.Game;
+using Satchel;
 using Vasi;
 
 namespace PantheonOfRegions.Behaviours
@@ -15,15 +16,10 @@ namespace PantheonOfRegions.Behaviours
         private void Awake()
         {
             _control = gameObject.LocateMyFSM("Control");
-            stunnail = Instantiate(PantheonOfRegions.GameObjects["stunnail"]);
-            deathnail = Instantiate(PantheonOfRegions.GameObjects["deathnail"]);
+            stunnail = Instantiate(PantheonOfRegions.GameObjects["stunnail"], new Vector2(90f, 15f), Quaternion.identity);
+            deathnail = Instantiate(PantheonOfRegions.GameObjects["deathnail"], new Vector2(90f, 15f), Quaternion.identity);
             wallspotl = Instantiate(PantheonOfRegions.GameObjects["wallspotl"], new Vector2(86f, 15f), Quaternion.identity);
             wallspotr = Instantiate(PantheonOfRegions.GameObjects["wallspotr"], new Vector2(102f, 15f), Quaternion.identity);
-            
-            stunnail.SetActive(true);
-            deathnail.SetActive(true);
-            wallspotl.SetActive(true);
-            wallspotr.SetActive(true);
         }
 
         private void Start()
@@ -36,19 +32,13 @@ namespace PantheonOfRegions.Behaviours
             _control.RemoveAction("Init", 32);
             _control.RemoveAction("Init", 31);
 
-            /*
-            _control.RemoveAction("Death Land 2", 4);
-            _control.RemoveAction("Air Catch", 11);
-            _control.RemoveAction("Air Catch", 10);
-            _control.RemoveAction("Air Catch", 9); */
-
             _control.Fsm.GetFsmGameObject("Stun Nail").Value = stunnail;
             _control.Fsm.GetFsmGameObject("Death Nail").Value = deathnail;
             _control.Fsm.GetFsmGameObject("Wallspot L").Value = wallspotl;
             _control.Fsm.GetFsmGameObject("Wallspot R").Value = wallspotr;
 
-
-
+            _control.AddCustomAction("Stun Wait", () => { _control.SendEvent("READY"); });
+            _control.AddCustomAction("Grabbing", () => { _control.SendEvent("GRABBED"); });
             _control.GetAction<FloatCompare>("Cyc Down").float2.Value = 19f;
             _control.GetAction<FloatOperator>("Cyc Jump Launch").float1.Value = 20f;
             _control.GetAction<SetFloatValue>("Jump To L", 0).floatValue.Value = 98f;
@@ -61,28 +51,13 @@ namespace PantheonOfRegions.Behaviours
             _control.GetAction<SetPosition>("Air Catch", 6).y = 20f;
             _control.GetAction<SetPosition>("Bounce L", 5).x = 86.5f;
             _control.GetAction<SetPosition>("Bounce R", 5).x = 101.5f;
+
             _control.GetAction<SetPosition>("Bounce D", 6).y = 15.5f;
-            _control.GetAction<SetPosition>("Bounce D", 6).x = 94f;
             _control.GetAction<SetPosition>("Bounce U", 5).y = 23.5f;
-            _control.GetAction<SetPosition>("Bounce U", 5).x = 94f;
             
 
             _control.RemoveAction("Begin Rage", 5);
             _control.RemoveAction("Acended HP", 1);
-
-            /*
-             _control.InsertCustomAction("Rage Dash", () =>
-            {
-                float x = gameObject.transform.GetPositionX();
-                float y = gameObject.transform.GetPositionY();
-                if (y <= 15) { _control.SendEvent("LAND"); }
-                else if (y >= 24) { _control.SendEvent("ROOF"); }
-                else if (x <= 86) { _control.SendEvent("L"); }
-                else if (x >= 102) { _control.SendEvent("R"); }
-            }, 2); */
-
-
-
 
 
         }

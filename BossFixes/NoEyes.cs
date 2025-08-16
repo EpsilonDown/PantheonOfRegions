@@ -6,15 +6,16 @@ namespace PantheonOfRegions.Behaviours
     internal class NoEyes : MonoBehaviour
     {
         private List<GameObject> _heads = new();
-
         private PlayMakerFSM _movement;
         private PlayMakerFSM _shotSpawn;
         private PlayMakerFSM _damaged;
+        private PlayMakerFSM _escal;
         private void Awake()
         {
             _movement = gameObject.LocateMyFSM("Movement");
             _damaged = gameObject.LocateMyFSM("Damage Response");
             _shotSpawn = gameObject.LocateMyFSM("Shot Spawn");
+            _escal = gameObject.LocateMyFSM("Escalation");
             Destroy(gameObject.LocateMyFSM("Attacking"));
             var corpse = ReflectionHelper.GetField<EnemyDeathEffects, GameObject>(GetComponent<EnemyDeathEffectsNoEffect>(), "corpse");
             corpse.LocateMyFSM("Control").GetState("End").RemoveAction<CreateObject>();
@@ -40,23 +41,23 @@ namespace PantheonOfRegions.Behaviours
             _movement.RemoveAction("Init",0);
             _shotSpawn.GetAction<RandomFloat>("Spawn L", 1).min = 105f;
             _shotSpawn.GetAction<RandomFloat>("Spawn L", 1).max = 135f;
-            _shotSpawn.GetAction<SetPosition>("Spawn L", 2).x = 35f;
+            _shotSpawn.GetAction<SetPosition>("Spawn L", 2).x = 30f;
             _shotSpawn.GetAction<RandomFloat>("Spawn L", 5).min = 120f;
             _shotSpawn.GetAction<RandomFloat>("Spawn L", 5).max = 135f;
-            _shotSpawn.GetAction<SetPosition>("Spawn L", 6).x = 70f;
+            _shotSpawn.GetAction<SetPosition>("Spawn L", 6).x = 75f;
 
             _shotSpawn.GetAction<RandomFloat>("Spawn R", 1).min = 105f;
             _shotSpawn.GetAction<RandomFloat>("Spawn R", 1).max = 120f;
-            _shotSpawn.GetAction<SetPosition>("Spawn R", 2).x = 70f;
+            _shotSpawn.GetAction<SetPosition>("Spawn R", 2).x = 75f;
             _shotSpawn.GetAction<RandomFloat>("Spawn R", 5).min = 120f;
             _shotSpawn.GetAction<RandomFloat>("Spawn R", 5).max = 135f;
-            _shotSpawn.GetAction<SetPosition>("Spawn R", 6).x = 35f;
+            _shotSpawn.GetAction<SetPosition>("Spawn R", 6).x = 30f;
 
             _shotSpawn.GetState("Spawn L").InsertMethod(1, () => _heads.Add(_shotSpawn.Fsm.GetFsmGameObject("Shot").Value));
             _shotSpawn.GetState("Spawn L").InsertMethod(6, () => _heads.Add(_shotSpawn.Fsm.GetFsmGameObject("Shot").Value));
             _shotSpawn.GetState("Spawn R").InsertMethod(1, () => _heads.Add(_shotSpawn.Fsm.GetFsmGameObject("Shot").Value));
             _shotSpawn.GetState("Spawn R").InsertMethod(6, () => _heads.Add(_shotSpawn.Fsm.GetFsmGameObject("Shot").Value));
-            //_escal.ChangeTransition("Idle","TOOK DAMAGE","Escalate 2");
+            _escal.ChangeTransition("Idle","TOOK DAMAGE","Escalate 2");
 
             _damaged.GetAction<SendRandomEvent>("Decide").weights = new FsmFloat[] { 0.8f, 0.2f };
         }
